@@ -6,30 +6,38 @@ export default function Effect() {
     const [time, setTime] = useState(0);
     const [start, setStart] = useState(false);
 
-    useEffect (() => {
+    useEffect(() => {
         let interval = null;
-        if(start) {
+        if (start) {
             interval = setInterval(() => {
-                setTime(time + 1);
+                setTime((prevTime) => prevTime + 1); // Use the previous state to update time
             }, 1000);
-        }
-        return () => {
+        } else {
             clearInterval(interval);
         }
-    }, [start, time]);
+        
+        return () => {
+            clearInterval(interval); // Cleanup on unmount or when start is toggled
+        };
+    }, [start]);
 
     function handleStart() {
         setStart(!start);
     }
 
+    function handleReset() {
+        setTime(0); // Reset time to 0
+        setStart(false); // Stop the timer when reset
+    }
+
     return (
         <View style={{ padding: 20 }}>
-            <Text>00:00:0{time}</Text>
-            <Button title="Reset"/>
+            <Text>00:00:{time < 10 ? `0${time}` : time}</Text> {/* Format the time */}
+            <Button onPress={handleReset} title="Reset" />
             <Button
                 onPress={handleStart}
-                title={!start ? 'Start': 'Stop'}
+                title={!start ? 'Start' : 'Stop'}
             />
         </View>
-    )
+    );
 }
